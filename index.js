@@ -1,3 +1,7 @@
+const message = document.querySelector("#game #message");
+const messageInfo = document.querySelector("#game #message #message-info");
+const overlay = document.querySelector("#game #overlay");
+const actionBtn = document.querySelector("#game #message #action-btn");
 const mapNumberToEmoji = {
   1: "😜",
   2: "🍰",
@@ -63,10 +67,23 @@ class LinkGame {
     this.dom.css({ width: this.x * 80, height: this.y * 80 });
     this.gamearrmap();
     this.renderdom();
-    // this.gamecontrol();
-
-    // console.log(this.testAll());
-    console.log(this.checkEmpty());
+    actionBtn.addEventListener("click", () => {
+      this.closeModal();
+      this.clearDom();
+      this.reorderMap();
+      this.renderdom();
+      this.gamecontrol();
+    });
+  }
+  showModel() {
+    messageInfo.textContent = "No matching pairs left, need to shuffle";
+    actionBtn.textContent = "Shuffle😘";
+    message.classList.add("shown");
+    overlay.classList.add("shown");
+  }
+  closeModal() {
+    message.classList.remove("shown");
+    overlay.classList.remove("shown");
   }
   testAll() {
     for (let i = 0; i < this.x * this.y; i++) {
@@ -194,13 +211,15 @@ class LinkGame {
 
             console.table(that.arrmap);
 
-            while (that.testAll() == false) {
-              if (that.checkEmpty()) break;
-              console.log("cannot match any pairs, reordering game map...");
-              that.clearDom();
-              that.reorderMap();
-              that.renderdom();
-              that.gamecontrol();
+            if (that.testAll() == false) {
+              if (!that.checkEmpty()) {
+                console.log("cannot match any pairs, reordering game map...");
+                that.showModel();
+              }
+              // that.clearDom();
+              // that.reorderMap();
+              // that.renderdom();
+              // that.gamecontrol();
             }
           }, 100);
         } else {
@@ -594,5 +613,3 @@ const game = new LinkGame(
   levels[2].l,
   $(".game")
 );
-
-console.log(game.checkEmpty());
