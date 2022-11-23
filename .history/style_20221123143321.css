@@ -1,0 +1,155 @@
+@charset "utf-8";
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.control {
+  width: 1000px;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.control input {
+  width: 40px;
+  text-align: center;
+}
+
+.control span {
+  font-size: 12px;
+  color: #999;
+}
+
+h3 {
+  text-align: center;
+}
+
+.game {
+  width: 1000px;
+  height: 600px;
+  margin: 0 auto;
+  /* background: url("../images/bg.png") 10px 10px; */
+  padding: 10px;
+  position: relative;
+}
+
+.game li {
+  font-size: 3rem;
+  color: #333;
+  width: 80px;
+  height: 80px;
+  /* background: url("../images/gamebg.png"); */
+  background-color: #333;
+  list-style: none;
+  float: left;
+  position: relative;
+  cursor: pointer;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* transition: all 0.1s ease-out; */
+}
+
+.game li:hover {
+  background-color: #ff5e3a;
+}
+
+.game li.active {
+  background-color: #fe8f76;
+}
+
+.game li i {
+  display: none;
+}
+
+/* .game li.active i {
+  display: block;
+  border: solid 2px #c00;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 76px;
+  height: 76px;
+} */
+
+.game li.list0 {
+  opacity: 0;
+  /* background-color: cornflowerblue; */
+}
+/*
+.game li.list1 {
+  background-position: 0 0;
+}
+
+.game li.list2 {
+  background-position: -80px 0;
+}
+
+.game li.list3 {
+  background-position: -160px 0;
+}
+
+.game li.list4 {
+  background-position: -240px 0;
+}
+
+.game li.list5 {
+  background-position: 0 -80px;
+}
+.game li.list6 {
+  background-position: -80px -80px;
+}
+.game li.list7 {
+  background-position: -160px -80px;
+}
+.game li.list8 {
+  background-position: -240px -80px;
+}
+.game li.list9 {
+  background-position: 0 -160px;
+}
+.game li.list10 {
+  background-position: -80px -160px;
+}
+.game li.list11 {
+  background-position: -160px -160px;
+}
+.game li.list12 {
+  background-position: -240px -160px;
+}
+.game li.list13 {
+  background-position: 0 -240px;
+}
+.game li.list14 {
+  background-position: -80px -240px;
+}
+.game li.list15 {
+  background-position: -160px -240px;
+}
+.game li.list16 {
+  background-position: -240px -240px;
+} */
+.game li.line {
+  border-radius: 0;
+  /* opacity: 60%; */
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 0;
+  height: 0;
+  background: #f8c6bbc1;
+  transition: none;
+}
+
+#game {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+/* 
+#game-stats {
+  display: flex;
+} */
