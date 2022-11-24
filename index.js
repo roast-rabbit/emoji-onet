@@ -642,4 +642,4 @@ class LinkGame {
   }
 }
 
-const game = new LinkGame(6, $(".game"));
+const game = new LinkGame(1, $(".game"));
