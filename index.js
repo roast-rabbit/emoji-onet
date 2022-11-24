@@ -2,6 +2,10 @@ const message = document.querySelector("#game #message");
 const messageInfo = document.querySelector("#game #message #message-info");
 const overlay = document.querySelector("#game #overlay");
 const actionBtn = document.querySelector("#game #message #action-btn");
+const currentLevel = document.querySelector(
+  "#game #game-stats #current-level span"
+);
+
 const mapNumberToEmoji = {
   1: "😜",
   2: "🍰",
@@ -19,7 +23,13 @@ const mapNumberToEmoji = {
   14: "🍞",
   15: "🎂",
   16: "⛈️",
+  17: "🍝",
+  18: "🥘",
+  19: "🍉",
+  20: "🐣",
+  21: "🐦",
 };
+
 const levels = {
   1: {
     x: 2,
@@ -51,22 +61,26 @@ const levels = {
     l: 100,
     z: 2,
   },
+  6: {
+    x: 8,
+    y: 8,
+    l: 100,
+    z: 4,
+  },
 };
+
 class LinkGame {
-  constructor(x, y, z, l, dom) {
-    this.x = x; //列数
-    this.y = y; //行数
-    this.l = l / 100; //游戏满盈率，最大为1(表示没有空白)，需要注意x*y*l%z=0
-    this.z = z; //每个相同元素出现的次数
+  constructor(level, dom) {
+    this.level = level;
+    currentLevel.textContent = level;
+    this.x = levels[level].x; //列数
+    this.y = levels[level].y; //行数
+    this.l = levels[level].l / 100; //游戏满盈率，最大为1(表示没有空白)，需要注意x*y*l%z=0
+    this.z = levels[level].z; //每个相同元素出现的次数
     this.dom = dom;
     this.gameinit();
     this.gamecontrol();
-  }
-  gameinit() {
-    //游戏初始化，生成游戏画布->游戏数据->渲染游戏DOM
-    this.dom.css({ width: this.x * 80, height: this.y * 80 });
-    this.gamearrmap();
-    this.renderdom();
+
     actionBtn.addEventListener("click", () => {
       this.closeModal();
       this.clearDom();
@@ -75,6 +89,26 @@ class LinkGame {
       this.gamecontrol();
     });
   }
+  gameinit() {
+    //游戏初始化，生成游戏画布->游戏数据->渲染游戏DOM
+    this.dom.css({ width: this.x * 80, height: this.y * 80 });
+    this.gamearrmap();
+    this.renderdom();
+  }
+
+  initGameToLevel(level) {
+    this.level = level > 6 ? 6 : level;
+    currentLevel.textContent = level;
+    this.x = levels[level]?.x || levels[6].x;
+    this.y = levels[level]?.y || levels[6].y;
+    this.l = levels[level]?.l / 100 || levels[6].l / 100;
+    this.z = levels[level]?.z || levels[6].z;
+
+    this.clearDom();
+    this.gameinit();
+    this.gamecontrol();
+  }
+
   showModel() {
     messageInfo.textContent = "No matching pairs left, need to shuffle";
     actionBtn.textContent = "Shuffle😘";
@@ -186,10 +220,12 @@ class LinkGame {
     var that = this;
     while (that.testAll() == false) {
       if (that.checkEmpty()) break;
-      console.log("cannot match any pairs, reordering game map...");
-      that.clearDom();
-      that.reorderMap();
-      that.renderdom();
+      else {
+        console.log("cannot match any pairs, reordering game map...");
+        that.clearDom();
+        that.reorderMap();
+        that.renderdom();
+      }
     }
     that.curr = null;
     that.dom.find("li").bind("click", function () {
@@ -211,15 +247,15 @@ class LinkGame {
 
             console.table(that.arrmap);
 
-            if (that.testAll() == false) {
+            while (that.testAll() == false) {
               if (!that.checkEmpty()) {
                 console.log("cannot match any pairs, reordering game map...");
                 that.showModel();
+                break;
+              } else {
+                that.initGameToLevel(that.level + 1);
+                break;
               }
-              // that.clearDom();
-              // that.reorderMap();
-              // that.renderdom();
-              // that.gamecontrol();
             }
           }, 100);
         } else {
@@ -240,13 +276,13 @@ class LinkGame {
   reorderMap() {
     console.table(this.arrmap);
     const tempArray = [];
-    for (let i = 1; i < this.x + 1; i++) {
-      for (let j = 1; j < this.y + 1; j++) {
+    for (let i = 1; i < this.x; i++) {
+      for (let j = 1; j < this.y; j++) {
         tempArray.push(this.arrmap[i][j]);
       }
     }
-    for (let i = 1; i < this.x + 1; i++) {
-      for (let j = 1; j < this.y + 1; j++) {
+    for (let i = 1; i < this.x; i++) {
+      for (let j = 1; j < this.y; j++) {
         const randomIndex = Math.floor(Math.random() * tempArray.length);
         this.arrmap[i][j] = tempArray.splice(randomIndex, 1)[0];
       }
@@ -606,10 +642,4 @@ class LinkGame {
   }
 }
 
-const game = new LinkGame(
-  levels[2].x,
-  levels[2].y,
-  levels[2].z,
-  levels[2].l,
-  $(".game")
-);
+const game = new LinkGame(6, $(".game"));
