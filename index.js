@@ -7,7 +7,7 @@ const currentLevel = document.querySelector(
 );
 
 const mapNumberToEmoji = {
-  1: "😜",
+  1: "🍀",
   2: "🍰",
   3: "🍫",
   4: "🍟",
