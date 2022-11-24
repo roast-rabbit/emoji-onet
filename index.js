@@ -68,6 +68,9 @@ const levels = {
     z: 4,
   },
 };
+const cellSize = 60;
+const lineWidth = cellSize / 10;
+const offSet = cellSize / 2 + lineWidth;
 
 class LinkGame {
   constructor(level, dom) {
@@ -91,7 +94,10 @@ class LinkGame {
   }
   gameinit() {
     //游戏初始化，生成游戏画布->游戏数据->渲染游戏DOM
-    this.dom.css({ width: this.x * 80, height: this.y * 80 });
+    this.dom.css({
+      width: `${this.x * cellSize * 0.3}vmin`,
+      height: `${this.y * cellSize * 0.3}vmin`,
+    });
     this.gamearrmap();
     this.renderdom();
   }
@@ -190,7 +196,9 @@ class LinkGame {
       for (let j = 0; j < this.x; j++) {
         console.log(`i:${i},j:${j}   ${this.arrmap[i + 1][j + 1]}`);
         this.dom.append(
-          `<li class="list${this.arrmap[i + 1][j + 1]}"><i></i>${
+          `<li class="list${this.arrmap[i + 1][j + 1]}" style="width:${
+            cellSize * 0.3
+          }vmin;height:${cellSize * 0.3}vmin"><i></i>${
             this.arrmap[i + 1][j + 1] !== 0
               ? mapNumberToEmoji[this.arrmap[i + 1][j + 1]]
               : ""
@@ -617,10 +625,10 @@ class LinkGame {
     $(".game .line")
       .eq(n)
       .css({
-        top: 49 + 80 * [i - 1],
-        left: 49 + 80 * [s - 1],
-        width: Math.abs(aj - bj) * 80 + 10,
-        height: 10,
+        top: `${(offSet + cellSize * [i - 1]) * 0.3}vmin`,
+        left: `${(offSet + cellSize * [s - 1]) * 0.3}vmin`,
+        width: `${(Math.abs(aj - bj) * cellSize + lineWidth) * 0.3}vmin`,
+        height: `${lineWidth * 0.3}vmin`,
       });
     setTimeout(function () {
       $(".game .line").eq(n).css({ top: 0, left: 0, width: 0, height: 0 });
@@ -631,10 +639,10 @@ class LinkGame {
     $(".game .line")
       .eq(n)
       .css({
-        top: 49 + 80 * [s - 1],
-        left: 49 + 80 * [j - 1],
-        width: 10,
-        height: Math.abs(ai - bi) * 80 + 10,
+        top: `${(offSet + cellSize * [s - 1]) * 0.3}vmin`,
+        left: `${(offSet + cellSize * [j - 1]) * 0.3}vmin`,
+        width: `${lineWidth * 0.3}vmin`,
+        height: `${(Math.abs(ai - bi) * cellSize + lineWidth) * 0.3}vmin`,
       });
     setTimeout(function () {
       $(".game .line").eq(n).css({ top: 0, left: 0, width: 0, height: 0 });
