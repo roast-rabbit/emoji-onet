@@ -12,10 +12,10 @@ const mapNumberToEmoji = {
   3: "🍫",
   4: "🍟",
   5: "🐰",
-  6: "😋",
+  6: "🍮",
   7: "🥮",
   8: "🥥",
-  9: "😛",
+  9: "❄️",
   10: "🥝",
   11: "🍏",
   12: "🍔",
@@ -62,15 +62,27 @@ const levels = {
     z: 2,
   },
   6: {
-    x: 8,
+    x: 6,
     y: 8,
     l: 100,
     z: 4,
   },
 };
+
+const getScaleParam = function () {
+  if (innerWidth > 400) {
+    return 0.15;
+  } else return 0.23;
+};
 const cellSize = 60;
 const lineWidth = cellSize / 10;
 const offSet = cellSize / 2 + lineWidth;
+let scaleParam = getScaleParam();
+
+window.addEventListener("beforeunload", () => {
+  game.initGameToLevel(1);
+  // scaleParam = getScaleParam();
+});
 
 class LinkGame {
   constructor(level, dom) {
@@ -95,8 +107,8 @@ class LinkGame {
   gameinit() {
     //游戏初始化，生成游戏画布->游戏数据->渲染游戏DOM
     this.dom.css({
-      width: `${this.x * cellSize * 0.3}vmin`,
-      height: `${this.y * cellSize * 0.3}vmin`,
+      width: `${this.x * cellSize * scaleParam}vmin`,
+      height: `${this.y * cellSize * scaleParam}vmin`,
     });
     this.gamearrmap();
     this.renderdom();
@@ -197,8 +209,8 @@ class LinkGame {
         console.log(`i:${i},j:${j}   ${this.arrmap[i + 1][j + 1]}`);
         this.dom.append(
           `<li class="list${this.arrmap[i + 1][j + 1]}" style="width:${
-            cellSize * 0.3
-          }vmin;height:${cellSize * 0.3}vmin"><i></i>${
+            cellSize * scaleParam
+          }vmin;height:${cellSize * scaleParam}vmin"><i></i>${
             this.arrmap[i + 1][j + 1] !== 0
               ? mapNumberToEmoji[this.arrmap[i + 1][j + 1]]
               : ""
@@ -625,10 +637,10 @@ class LinkGame {
     $(".game .line")
       .eq(n)
       .css({
-        top: `${(offSet + cellSize * [i - 1]) * 0.3}vmin`,
-        left: `${(offSet + cellSize * [s - 1]) * 0.3}vmin`,
-        width: `${(Math.abs(aj - bj) * cellSize + lineWidth) * 0.3}vmin`,
-        height: `${lineWidth * 0.3}vmin`,
+        top: `${(offSet + cellSize * [i - 1]) * scaleParam}vmin`,
+        left: `${(offSet + cellSize * [s - 1]) * scaleParam}vmin`,
+        width: `${(Math.abs(aj - bj) * cellSize + lineWidth) * scaleParam}vmin`,
+        height: `${lineWidth * scaleParam}vmin`,
       });
     setTimeout(function () {
       $(".game .line").eq(n).css({ top: 0, left: 0, width: 0, height: 0 });
@@ -639,10 +651,12 @@ class LinkGame {
     $(".game .line")
       .eq(n)
       .css({
-        top: `${(offSet + cellSize * [s - 1]) * 0.3}vmin`,
-        left: `${(offSet + cellSize * [j - 1]) * 0.3}vmin`,
-        width: `${lineWidth * 0.3}vmin`,
-        height: `${(Math.abs(ai - bi) * cellSize + lineWidth) * 0.3}vmin`,
+        top: `${(offSet + cellSize * [s - 1]) * scaleParam}vmin`,
+        left: `${(offSet + cellSize * [j - 1]) * scaleParam}vmin`,
+        width: `${lineWidth * scaleParam}vmin`,
+        height: `${
+          (Math.abs(ai - bi) * cellSize + lineWidth) * scaleParam
+        }vmin`,
       });
     setTimeout(function () {
       $(".game .line").eq(n).css({ top: 0, left: 0, width: 0, height: 0 });

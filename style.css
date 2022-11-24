@@ -24,10 +24,10 @@ h3 {
 }
 
 .game li {
-  font-size: 3rem;
+  font-size: 2em;
   color: #333;
-  width: 80px;
-  height: 80px;
+  /* width: 80px;
+  height: 80px; */
   background-color: #333;
   list-style: none;
   float: left;
@@ -37,7 +37,7 @@ h3 {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* transition: all 0.1s ease-out; */
+  transition: background 0.3s;
 }
 
 .game li:hover {
@@ -130,8 +130,8 @@ h3 {
   display: block;
 }
 
-/* @media screen and (max-device-width: 480px) and (orientation: portrait) {
-  .game {
-    transform: scale(0.5);
+@media screen and (min-width: 480px) {
+  .game li {
+    font-size: 3em;
   }
-} */
+}
