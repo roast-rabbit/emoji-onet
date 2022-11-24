@@ -57,9 +57,9 @@ const levels = {
   },
   5: {
     x: 6,
-    y: 7,
-    l: 100,
-    z: 2,
+    y: 8,
+    l: 50,
+    z: 4,
   },
   6: {
     x: 6,
@@ -69,19 +69,13 @@ const levels = {
   },
 };
 
-const getScaleParam = function () {
-  if (innerWidth > 400) {
-    return 0.15;
-  } else return 0.23;
-};
 const cellSize = 60;
 const lineWidth = cellSize / 10;
 const offSet = cellSize / 2 + lineWidth;
-let scaleParam = getScaleParam();
+let scaleParam = 0.2;
 
-window.addEventListener("beforeunload", () => {
-  game.initGameToLevel(1);
-  // scaleParam = getScaleParam();
+window.addEventListener("onunload", () => {
+  game = new LinkGame(1, $(".game"));
 });
 
 class LinkGame {
@@ -111,6 +105,22 @@ class LinkGame {
       height: `${this.y * cellSize * scaleParam}vmin`,
     });
     this.gamearrmap();
+
+    let stop = false;
+
+    setTimeout(() => {
+      stop = true;
+    }, 100);
+
+    while (this.testAll() === false && stop === false) {
+      console.log(`stop:${stop}`);
+      if (this.checkEmpty()) break;
+      else {
+        console.log("cannot match any pairs, reordering game map...");
+        this.gamearrmap();
+      }
+    }
+    this.clearDom();
     this.renderdom();
   }
 
@@ -123,6 +133,7 @@ class LinkGame {
     this.z = levels[level]?.z || levels[6].z;
 
     this.clearDom();
+    this.dom = $(".game");
     this.gameinit();
     this.gamecontrol();
   }
@@ -238,15 +249,7 @@ class LinkGame {
   gamecontrol() {
     console.table(this.arrmap);
     var that = this;
-    while (that.testAll() == false) {
-      if (that.checkEmpty()) break;
-      else {
-        console.log("cannot match any pairs, reordering game map...");
-        that.clearDom();
-        that.reorderMap();
-        that.renderdom();
-      }
-    }
+
     that.curr = null;
     that.dom.find("li").bind("click", function () {
       if (that.curr == null) {
