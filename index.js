@@ -1,7 +1,13 @@
 const message = document.querySelector("#game #message");
 const messageInfo = document.querySelector("#game #message #message-info");
 const overlay = document.querySelector("#game #overlay");
-const actionBtn = document.querySelector("#game #message #action-btn");
+const actionBtnSuffle = document.querySelector(
+  "#game #message .action-btn#shuffle"
+);
+const actionBtnRestart = document.querySelector(
+  "#game #message .action-btn#restart"
+);
+const timeRemaining = document.querySelector("#time-remaining span");
 const currentLevel = document.querySelector(
   "#game #game-stats #current-level span"
 );
@@ -28,6 +34,9 @@ const mapNumberToEmoji = {
   19: "🍉",
   20: "🐣",
   21: "🐦",
+  22: "🥟",
+  23: "🧃",
+  24: "🍺",
 };
 
 const levels = {
@@ -65,7 +74,7 @@ const levels = {
     x: 6,
     y: 8,
     l: 100,
-    z: 4,
+    z: 2,
   },
 };
 
@@ -74,11 +83,10 @@ const lineWidth = cellSize / 10;
 const offSet = cellSize / 2 + lineWidth;
 let scaleParam = 0.2;
 
-window.addEventListener("onunload", () => {
-  game = new LinkGame(1, $(".game"));
-});
-
 class LinkGame {
+  #time = 30;
+  #timer;
+  #timeoutId;
   constructor(level, dom) {
     this.level = level;
     currentLevel.textContent = level;
@@ -89,13 +97,18 @@ class LinkGame {
     this.dom = dom;
     this.gameinit();
     this.gamecontrol();
+    this.startTimer();
 
-    actionBtn.addEventListener("click", () => {
+    actionBtnSuffle.addEventListener("click", () => {
       this.closeModal();
       this.clearDom();
       this.reorderMap();
       this.renderdom();
       this.gamecontrol();
+    });
+    actionBtnRestart.addEventListener("click", () => {
+      this.closeModal();
+      this.initGameToLevel(1);
     });
   }
   gameinit() {
@@ -106,14 +119,7 @@ class LinkGame {
     });
     this.gamearrmap();
 
-    let stop = false;
-
-    setTimeout(() => {
-      stop = true;
-    }, 100);
-
-    while (this.testAll() === false && stop === false) {
-      console.log(`stop:${stop}`);
+    while (this.testAll() === false) {
       if (this.checkEmpty()) break;
       else {
         console.log("cannot match any pairs, reordering game map...");
@@ -136,13 +142,38 @@ class LinkGame {
     this.dom = $(".game");
     this.gameinit();
     this.gamecontrol();
+    if (level === 1) {
+      this.#time = 30;
+    } else {
+      this.#time += 30;
+    }
   }
-
-  showModel() {
-    messageInfo.textContent = "No matching pairs left, need to shuffle";
-    actionBtn.textContent = "Shuffle😘";
+  tick() {
+    const min = String(Math.trunc(this.#time / 60)).padStart(2, "00");
+    const sec = String(this.#time % 60).padStart(2, "00");
+    timeRemaining.textContent = `${min}:${sec}`;
+    if (this.#time > 0) {
+      this.#time--;
+    } else {
+      this.showModel({ type: "restart" });
+    }
+  }
+  startTimer() {
+    this.tick();
+    this.#timer = setInterval(() => {
+      this.tick();
+    }, 1000);
+  }
+  showModel({ type }) {
+    messageInfo.textContent =
+      type === "restart"
+        ? "timeout"
+        : "No matching pairs left, need to shuffle";
     message.classList.add("shown");
     overlay.classList.add("shown");
+    type === "restart"
+      ? actionBtnRestart.classList.add("shown")
+      : actionBtnSuffle.classList.add("shown");
   }
   closeModal() {
     message.classList.remove("shown");
@@ -174,9 +205,6 @@ class LinkGame {
         arrmap[i].push(0);
       }
     }
-
-    // console.log("arrmap:");
-    // console.log(arrmap);
 
     const arrbase = []; // 生成基础数据一维数组
     let max = (this.x * this.y * this.l) / this.z;
@@ -246,12 +274,44 @@ class LinkGame {
     }
     console.log(data);
   }
+  showHint() {
+    console.table(this.arrmap);
+    const liArray = this.dom.find("li");
+
+    console.log(liArray);
+    loop1: for (let i = 0; i < this.x * this.y; i++) {
+      for (let j = i + 1; j < this.x * this.y; j++) {
+        if (this.testConnect(i, j) == true) {
+          const li1 = liArray.get(i);
+          const li2 = liArray.get(j);
+          if (
+            !li1.classList.contains("list0") &&
+            !li2.classList.contains("list0")
+          ) {
+            li1.classList.add("hint");
+            li2.classList.add("hint");
+            break loop1;
+          }
+        }
+      }
+    }
+  }
+  setHintInSecond({ sec }) {
+    clearTimeout(this.#timeoutId);
+    this.#timeoutId = setTimeout(() => {
+      this.showHint();
+    }, sec * 1000);
+  }
   gamecontrol() {
     console.table(this.arrmap);
     var that = this;
+    that.setHintInSecond({ sec: 5 });
 
     that.curr = null;
     that.dom.find("li").bind("click", function () {
+      if ($(this).hasClass("hint")) {
+        $(this).removeClass("hint");
+      }
       if (that.curr == null) {
         //没有选中项的情况
         $(this).addClass("active");
@@ -262,7 +322,6 @@ class LinkGame {
           //若能连接
           that.dom.find("li").css("pointer-events", "none");
           setTimeout(() => {
-            console.log(that.curr);
             that.curr.removeAttr("class").addClass("list0").unbind("click");
             $(this).removeAttr("class").addClass("list0").unbind("click");
             that.curr = null;
@@ -273,7 +332,7 @@ class LinkGame {
             while (that.testAll() == false) {
               if (!that.checkEmpty()) {
                 console.log("cannot match any pairs, reordering game map...");
-                that.showModel();
+                that.showModel({ type: "shuffle" });
                 break;
               } else {
                 that.initGameToLevel(that.level + 1);
@@ -286,6 +345,7 @@ class LinkGame {
           that.curr = $(this);
         }
       }
+      that.setHintInSecond({ sec: 5 });
     });
     that.dom.find("li.list0").unbind("click"); //为空项的取消绑定
   }
@@ -299,13 +359,13 @@ class LinkGame {
   reorderMap() {
     console.table(this.arrmap);
     const tempArray = [];
-    for (let i = 1; i < this.x; i++) {
-      for (let j = 1; j < this.y; j++) {
+    for (let i = 1; i < this.y; i++) {
+      for (let j = 1; j < this.x; j++) {
         tempArray.push(this.arrmap[i][j]);
       }
     }
-    for (let i = 1; i < this.x; i++) {
-      for (let j = 1; j < this.y; j++) {
+    for (let i = 1; i < this.y; i++) {
+      for (let j = 1; j < this.x; j++) {
         const randomIndex = Math.floor(Math.random() * tempArray.length);
         this.arrmap[i][j] = tempArray.splice(randomIndex, 1)[0];
       }

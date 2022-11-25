@@ -47,6 +47,9 @@ h3 {
 .game li.active {
   background-color: #fe8f76;
 }
+.game li.hint {
+  background-color: cornflowerblue;
+}
 
 .game li i {
   display: none;
@@ -103,15 +106,19 @@ h3 {
   display: block;
 }
 
-#message #action-btn {
+#message .action-btn {
   cursor: pointer;
   background-color: #ccc;
   border-radius: 10px;
   font-size: 4vmin;
   padding: 2vmin;
+  display: none;
+}
+#message .action-btn.shown {
+  display: block;
 }
 
-#message #action-btn:hover {
+#message .action-btn:hover {
   background-color: #fff;
 }
 
